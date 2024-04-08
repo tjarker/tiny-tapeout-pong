@@ -17,11 +17,12 @@ module tt_um_chisel_template (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  // assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  // assign uio_out = 0;
-  // assign uio_oe  = 0;
+  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
+  assign uio_out = 0;
+  assign uio_oe  = 0;
     wire reset = !rst_n;
     // Just wrap the Chisel generated Verilog
+    /*
     ChiselTop ChiselTop(.clock(clk),
       .reset(reset),
       .io_ui_in(ui_in),
@@ -31,4 +32,5 @@ module tt_um_chisel_template (
       .io_uio_oe(uio_oe),
       .io_ena(ena));
 
+*/
 endmodule

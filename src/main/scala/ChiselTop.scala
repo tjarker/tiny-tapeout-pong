@@ -26,8 +26,8 @@ class ChiselTop() extends Module {
   // have default outputs
   io.uo_out := 0.U
   io.uio_out := 0.U
-  // use bi-directionals as outputs
-  io.uio_oe := "hff".U
+  // use bi-directionals as input
+  io.uio_oe := 0.U
 
   io.uo_out := io.ui_in + io.uio_in
 }

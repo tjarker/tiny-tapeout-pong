@@ -1,20 +1,18 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# Tiny Tapeout Chisel Project Template
 
 - [Read the documentation for project](docs/info.md)
 
 ## What is Tiny Tapeout?
 
-TinyTapeout is an educational project that aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip.
+Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip.
 
 To learn more and get started, visit https://tinytapeout.com.
 
-## Verilog Projects
+## Chisel Projects
 
-TODO: rewrite this for Chisel
-
-1. Add your Verilog files to the `src` folder.
+1. Add your Chisel files to the `src` folder and below according the `sbt` conventions.
 2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
 3. Edit [docs/info.md](docs/info.md) and add a description of your project.
 4. Optionally, add a testbench to the `test` folder. See [test/README.md](test/README.md) for more information.

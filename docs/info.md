@@ -13,7 +13,7 @@ This is a Chisel template
 
 ## How to test
 
-Currently cocotb, shall change to ChiselTest
+Currently we use cocotb, this shall change to ChiselTest
 
 ## External hardware
 

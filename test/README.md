@@ -11,6 +11,12 @@ This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://
 
 To run the RTL simulation:
 
+First generate the Chisel Verilog output by running in the project root:
+
+```sh
+sbt run
+```
+
 ```sh
 make -B
 ```

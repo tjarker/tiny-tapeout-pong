@@ -5,5 +5,5 @@ run-test:
 
 # Configure the Basys3 with open source tools
 
-configure:
+config:
 	openocd -f 7series.txt

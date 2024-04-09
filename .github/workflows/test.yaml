@@ -29,6 +29,9 @@ jobs:
       - name: generate Verilog
         run: sbt run
 
+      - name: run Chisel tests
+        run: sbt test
+
       - name: Run tests
         run: |
           cd test

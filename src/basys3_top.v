@@ -13,6 +13,11 @@ module basys3_top (
     output  wire [6:0] seg,   // 7-segment
     output  wire dp,          // 7-segment
     output  wire [3:0] an,    // 7-segment
+    output wire [3:0] vgaRed, // VGA red
+    output wire [3:0] vgaGreen, // VGA green
+    output wire [3:0] vgaBlue, // VGA blue
+    output wire Hsync,        // VGA Hsync
+    output wire Vsync,        // VGA Vsync
     input  wire clock,        // clock
     input  wire reset         // reset - high active
 );
@@ -31,6 +36,29 @@ module basys3_top (
     wire [7:0] uio_out; // TODO: shall go to PMOD, depending on the design
     wire [7:0] uio_oe;  // ignored
 
+    wire [1:0] red = {uo_out[4], uo_out[0]};
+    wire [1:0] green = {uo_out[5], uo_out[1]};
+    wire [1:0] blue = {uo_out[6], uo_out[2]};
+    assign Hsync = uo_out[7];
+    assign Vsync = uo_out[3];
+
+    // 00 -> 0000
+    // 01 -> 0100
+    // 10 -> 1000
+    // 11 -> 1111
+    assign vgaRed = (red == 2'b00) ? 4'b0000 :
+                   (red == 2'b01) ? 4'b0100 :
+                   (red == 2'b10) ? 4'b1000 :
+                   4'b1111;
+    assign vgaGreen = (green == 2'b00) ? 4'b0000 :
+                     (green == 2'b01) ? 4'b0100 :
+                     (green == 2'b10) ? 4'b1000 :
+                     4'b1111;
+    assign vgaBlue = (blue == 2'b00) ? 4'b0000 :
+                    (blue == 2'b01) ? 4'b0100 :
+                    (blue == 2'b10) ? 4'b1000 :
+                    4'b1111;
+
     tt_um_example user_project (
           .ui_in  (ui_in),    // Dedicated inputs
           .uo_out (uo_out),   // Dedicated outputs
@@ -44,4 +72,4 @@ module basys3_top (
 
     assign led = uo_out;
 
-endmodule
+endmodule : basys3_top

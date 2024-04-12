@@ -1,7 +1,7 @@
 import chisel3._
 import chisel3.util.Cat
 import pong.Pong
-import pong.etc.Hertz.IntHertz
+import pong.etc._
 
 /** Example design in Chisel.
   * A redesign of the Tiny Tapeout example.

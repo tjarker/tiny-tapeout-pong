@@ -1,7 +1,7 @@
 package pong
 
 import chisel3._
-import pong.etc.{Color, Vec2D}
+import pong.etc._
 
 class Ball extends Module {
 

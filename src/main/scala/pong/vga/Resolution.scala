@@ -1,7 +1,6 @@
 package pong.vga
 
-import pong.etc.Hertz
-import pong.etc.Hertz.IntHertz
+import pong.etc._
 
 case class Timings(
     active: Int,

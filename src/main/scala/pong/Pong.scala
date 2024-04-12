@@ -1,9 +1,9 @@
 package pong
 
 import chisel3._
-import pong.etc.{Color, Hertz, TickGen, Vec2D}
-import pong.etc.Hertz.IntHertz
+import pong.etc._
 import vga._
+
 class Pong()(implicit sysFreq: Hertz) extends Module {
 
   val io = IO(new Bundle {

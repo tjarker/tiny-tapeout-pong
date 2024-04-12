@@ -2,7 +2,8 @@ package pong.vga
 
 import chisel3._
 import chisel3.util._
-import pong.etc.{Hertz, TickGen}
+import pong.etc._
+
 class VgaTimer(res: Resolution)(implicit sysFreq: Hertz) extends Module {
 
   val io = IO(new Bundle {

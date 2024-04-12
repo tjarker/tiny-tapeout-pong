@@ -13,22 +13,29 @@ class Ball extends Module {
     val gameTick = Input(Bool())
   })
 
-  val ballPosx = RegInit((640 / 2).U(11.W))
-  val ballPosy = RegInit((480 / 2).U(11.W))
+  val ballPosx = RegInit((640 * 4 / 2).U(13.W))
+  val ballPosy = RegInit((480 * 4 / 2).U(13.W))
 
   val ballVelx = RegInit(3.S(5.W))
   val ballVely = RegInit(2.S(5.W))
 
   val ballRadius = 5
 
+  val x = ballPosx(12, 2)
+  val y = ballPosy(12, 2)
+
   when(io.gameTick) {
-    when(ballPosx < ballRadius.U || ballPosx > (640 - 1 - ballRadius).U) {
+    when(
+      ballPosx < (4 * ballRadius).U || ballPosx > (4 * 640 - 1 - 4 * ballRadius).U
+    ) {
       ballVelx := -ballVelx
       ballPosx := (ballPosx.asSInt - ballVelx).asUInt
     } otherwise {
       ballPosx := (ballPosx.asSInt + ballVelx).asUInt
     }
-    when(ballPosy < ballRadius.U || ballPosy > (480 - 1 - ballRadius).U) {
+    when(
+      ballPosy < (4 * ballRadius).U || ballPosy > (4 * 480 - 1 - 4 * ballRadius).U
+    ) {
       ballVely := -ballVely
       ballPosy := (ballPosy.asSInt - ballVely).asUInt
     } otherwise {
@@ -37,8 +44,8 @@ class Ball extends Module {
   }
 
   val active =
-    io.pxlPos.x >= (ballPosx - ballRadius.U) && io.pxlPos.x < (ballPosx + ballRadius.U) &&
-      io.pxlPos.y >= (ballPosy - ballRadius.U) && io.pxlPos.y < (ballPosy + ballRadius.U)
+    io.pxlPos.x >= (x - ballRadius.U) && io.pxlPos.x < (x + ballRadius.U) &&
+      io.pxlPos.y >= (y - ballRadius.U) && io.pxlPos.y < (y + ballRadius.U)
 
   val black = Color(2.W, 0.U, 0.U, 0.U)
 

@@ -16,7 +16,7 @@ class Pong()(implicit sysFreq: Hertz) extends Module {
 
   val ball = Module(new Ball)
   ball.io.pxlPos := Vec2D(vgaTimer.io.x, vgaTimer.io.y)
-  ball.io.gameTick := TickGen(10.Hz)
+  ball.io.gameTick := rising(vgaTimer.io.vSync)
 
   io.hSync := vgaTimer.io.hSync
   io.vSync := vgaTimer.io.vSync

@@ -1,6 +1,7 @@
 import chisel3._
 import chisel3.util.Cat
 import pong.Pong
+import pong.etc.Hertz.IntHertz
 
 /** Example design in Chisel.
   * A redesign of the Tiny Tapeout example.
@@ -31,7 +32,7 @@ class ChiselTop() extends Module {
 
   io.uo_out := 0.U
 
-  val pong = Module(new Pong())
+  val pong = Module(new Pong()(100.MHz))
 
   io.uo_out := Cat(
     pong.io.hSync,

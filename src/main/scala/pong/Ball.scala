@@ -6,7 +6,7 @@ import pong.etc.{Color, Vec2D}
 class Ball extends Module {
 
   val io = IO(new Bundle {
-    val pxlPos = Input(Vec2D())
+    val pxlPos = Input(Vec2D(10.W))
     val rgb = Output(Color(2.W))
     val active = Output(Bool())
 

@@ -3,7 +3,6 @@ package pong.etc
 import chisel3._
 import chisel3.experimental.BundleLiterals.AddBundleLiteralConstructor
 import chisel3.internal.firrtl.Width
-import chisel3.util.log2Ceil
 
 class Color(bits: Width) extends Bundle {
   val r = UInt(bits)

@@ -4,9 +4,10 @@ import chisel3._
 import chisel3.util._
 object TickGen {
 
-  def apply(period: Int): Bool = {
+  def apply(freq: Hertz)(implicit sysFreq: Hertz): Bool = {
 
-    println(period)
+    val period = sysFreq / freq
+
     val tickReg = RegInit(0.U(log2Ceil(period).W))
 
     val tick = tickReg === (period - 1).U

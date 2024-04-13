@@ -27,14 +27,12 @@ class ChiselTop() extends Module {
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
    */
-  io.uio_out := 0.U
-  // use bi-directionals as input
-  io.uio_oe := 0.U
-
-  io.uo_out := 0.U
 
   val pong = Module(new Pong(Resolution.VGA640x480)(100.MHz))
   pong.io.btn := io.ui_in(3, 0)
+
+  io.uio_oe := 1.U
+  io.uio_out := pong.io.state
 
   io.uo_out := Cat(
     pong.io.hSync,

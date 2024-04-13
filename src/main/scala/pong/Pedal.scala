@@ -26,8 +26,7 @@ class Pedal(res: Resolution, xRange: Range) extends Module {
   when(io.gameTick) {
     when(io.up && pos > 30.U) {
       pos := pos - speed.U
-    }
-    when(io.down && pos < (res.height - 30).U) {
+    }.elsewhen(io.down && pos < (res.height - 30).U) {
       pos := pos + speed.U
     }
   }

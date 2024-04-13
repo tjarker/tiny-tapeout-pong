@@ -14,6 +14,8 @@ module basys3_top (
     output wire Hsync,        // VGA Hsync
     output wire Vsync,        // VGA Vsync
 
+    output wire [7:0] led,    // LEDs [7:0]
+
     input wire btnU,          // button U
     input wire btnD,          // button D
     input wire btnL,          // button L
@@ -26,7 +28,7 @@ module basys3_top (
     wire rst_n = ~reset;
     wire ena = 1'b1;
 
-    wire [7:0] ui_in = {4'b0000 ,btnR, btnL, btnD ,btnU};
+    wire [7:0] ui_in = {4'b0000 ,btnD, btnR, btnL ,btnU};
     wire [7:0] uo_out;
     wire [7:0] uio_in = 8'b00000000;
     wire [7:0] uio_out;
@@ -37,6 +39,7 @@ module basys3_top (
     wire [1:0] blue = {uo_out[6], uo_out[2]};
     assign Hsync = uo_out[7];
     assign Vsync = uo_out[3];
+    assign led = uio_out;
 
     // 00 -> 0000
     // 01 -> 0100

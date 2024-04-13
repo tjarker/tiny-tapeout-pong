@@ -13,7 +13,14 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
     val rgb = Output(Color(2.W))
 
     val btn = Input(UInt(4.W))
+
+    val state = Output(UInt(8.W))
   })
+
+  object State extends ChiselEnum {
+    val Waiting, Playing, GameOver, Reset = Value
+  }
+  val stateReg = RegInit(State.Waiting)
 
   val vgaTimer = Module(new VgaTimer(res))
 
@@ -38,6 +45,8 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
   ball.io.gameTick := tick
   ball.io.leftPedal := pedal0.io.pos
   ball.io.rightPedal := pedal1.io.pos
+  ball.io.newGame := stateReg === State.Reset
+  ball.io.run := stateReg === State.Playing
 
   io.hSync := vgaTimer.io.hSync
   io.vSync := vgaTimer.io.vSync
@@ -49,5 +58,28 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
       ball.io.active -> ball.io.rgb
     )
   )
+
+  switch(stateReg) {
+    is(State.Waiting) {
+      when(btn.reduce(_ || _)) {
+        stateReg := State.Playing
+      }
+    }
+    is(State.Playing) {
+      when(ball.io.lost) {
+        stateReg := State.GameOver
+      }
+    }
+    is(State.GameOver) {
+      when(btn.reduce(_ || _)) {
+        stateReg := State.Reset
+      }
+    }
+    is(State.Reset) {
+      stateReg := State.Waiting
+    }
+  }
+
+  io.state := ball.io.lost ## stateReg.asUInt
 
 }

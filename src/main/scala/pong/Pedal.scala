@@ -14,18 +14,20 @@ class Pedal(res: Resolution, xRange: Range) extends Module {
     val rgb = Output(Color(2.W))
     val active = Output(Bool())
 
+    val pos = Output(UInt(log2Ceil(res.height).W))
+
     val gameTick = Input(Bool())
   })
 
-  val speed = 2
+  val speed = 3
 
   val pos = RegInit((res.height / 2).U(log2Ceil(res.height).W))
 
   when(io.gameTick) {
-    when(io.up && pos > 0.U) {
+    when(io.up && pos > 30.U) {
       pos := pos - speed.U
     }
-    when(io.down && pos < res.height.U) {
+    when(io.down && pos < (res.height - 30).U) {
       pos := pos + speed.U
     }
   }
@@ -37,5 +39,7 @@ class Pedal(res: Resolution, xRange: Range) extends Module {
 
   io.rgb := Mux(active, Color(2.W, 0.U, 3.U, 0.U), black)
   io.active := active
+
+  io.pos := pos
 
 }

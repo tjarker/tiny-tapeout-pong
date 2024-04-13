@@ -33,9 +33,11 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
   pedal1.io.up := btn(2)
   pedal1.io.down := btn(3)
 
-  val ball = Module(new Ball(5, res))
+  val ball = Module(new Ball(res))
   ball.io.pxlPos := Vec2D(vgaTimer.io.x, vgaTimer.io.y)
   ball.io.gameTick := tick
+  ball.io.leftPedal := pedal0.io.pos
+  ball.io.rightPedal := pedal1.io.pos
 
   io.hSync := vgaTimer.io.hSync
   io.vSync := vgaTimer.io.vSync

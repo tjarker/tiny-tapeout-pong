@@ -8,33 +8,29 @@
 `define default_netname none
 
 module basys3_top (
-    input  wire [15:0] sw,    // Switches
-    output  wire [7:0] led,   // LEDs
-    output  wire [6:0] seg,   // 7-segment
-    output  wire dp,          // 7-segment
-    output  wire [3:0] an,    // 7-segment
     output wire [3:0] vgaRed, // VGA red
     output wire [3:0] vgaGreen, // VGA green
     output wire [3:0] vgaBlue, // VGA blue
     output wire Hsync,        // VGA Hsync
     output wire Vsync,        // VGA Vsync
+
+    input wire btnU,          // button U
+    input wire btnD,          // button D
+    input wire btnL,          // button L
+    input wire btnR,          // button R
+
     input  wire clock,        // clock
     input  wire reset         // reset - high active
 );
 
-    assign seg = 7'b0000000;
-    assign dp = 1'b0;
-    assign an = 4'b1110;
-
     wire rst_n = ~reset;
     wire ena = 1'b1;
-    // TODO: add a crude clock divider to slow down the clock to 50 MHz
-    wire clk = clock;
-    wire [7:0] ui_in = sw [7:0];
+
+    wire [7:0] ui_in = {4'b0000 ,btnR, btnL, btnD ,btnU};
     wire [7:0] uo_out;
-    wire [7:0] uio_in = sw [15:8];
-    wire [7:0] uio_out; // TODO: shall go to PMOD, depending on the design
-    wire [7:0] uio_oe;  // ignored
+    wire [7:0] uio_in = 8'b00000000;
+    wire [7:0] uio_out;
+    wire [7:0] uio_oe;
 
     wire [1:0] red = {uo_out[4], uo_out[0]};
     wire [1:0] green = {uo_out[5], uo_out[1]};
@@ -66,10 +62,8 @@ module basys3_top (
           .uio_out(uio_out),  // IOs: Output path
           .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
           .ena    (ena),      // enable - goes high when design is selected
-          .clk    (clk),      // clock
+          .clk    (clock),      // clock
           .rst_n  (rst_n)     // not reset
       );
-
-    assign led = uo_out;
 
 endmodule : basys3_top

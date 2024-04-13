@@ -2,6 +2,7 @@ import chisel3._
 import chisel3.util.Cat
 import pong.Pong
 import pong.etc._
+import pong.vga.Resolution
 
 /** Example design in Chisel.
   * A redesign of the Tiny Tapeout example.
@@ -32,7 +33,8 @@ class ChiselTop() extends Module {
 
   io.uo_out := 0.U
 
-  val pong = Module(new Pong()(100.MHz))
+  val pong = Module(new Pong(Resolution.VGA640x480)(100.MHz))
+  pong.io.btn := io.ui_in(3, 0)
 
   io.uo_out := Cat(
     pong.io.hSync,

@@ -10,4 +10,8 @@ package object etc {
   }
 
   def rising(edge: Bool): Bool = edge && !RegNext(edge)
+
+  implicit class rangeCheck(x: UInt) {
+    def inRange(min: UInt, max: UInt): Bool = x >= min && x < max
+  }
 }

@@ -10,6 +10,8 @@ case class Timings(
 )
 
 case class Resolution(
+    width: Int,
+    height: Int,
     h: Timings,
     v: Timings,
     line: Int,
@@ -26,6 +28,8 @@ object Resolution {
 
   object VGA640x480
       extends Resolution(
+        640,
+        480,
         Timings(640, 16, 96, 48),
         Timings(480, 10, 2, 33),
         800,

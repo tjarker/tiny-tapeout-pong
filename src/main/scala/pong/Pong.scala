@@ -48,6 +48,10 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
   ball.io.newGame := stateReg === State.Reset
   ball.io.run := stateReg === State.Playing
 
+  val score = Module(new TextField(res, 50, 0, "score: "))
+  score.io.pxlPos := Vec2D(vgaTimer.io.x, vgaTimer.io.y)
+  score.io.up := stateReg === State.Reset
+
   io.hSync := vgaTimer.io.hSync
   io.vSync := vgaTimer.io.vSync
 
@@ -55,6 +59,7 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
     Seq(
       pedal0.io.active -> pedal0.io.rgb,
       pedal1.io.active -> pedal1.io.rgb,
+      score.io.active -> score.io.rgb,
       ball.io.active -> ball.io.rgb
     )
   )

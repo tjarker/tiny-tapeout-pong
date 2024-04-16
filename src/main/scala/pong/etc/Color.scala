@@ -4,21 +4,27 @@ import chisel3._
 import chisel3.experimental.BundleLiterals.AddBundleLiteralConstructor
 import chisel3.internal.firrtl.Width
 
-class Color(bits: Width) extends Bundle {
-  val r = UInt(bits)
-  val g = UInt(bits)
-  val b = UInt(bits)
+class Color extends Bundle {
+  val r = UInt(2.W)
+  val g = UInt(2.W)
+  val b = UInt(2.W)
 }
 
 object Color {
-  def apply(bits: Width): Color = new Color(bits)
+  def apply(): Color = new Color()
 
-  def apply(w: Width, r: UInt, g: UInt, b: UInt): Color = {
-    val color = new Color(w).Lit(
+  def apply(r: UInt, g: UInt, b: UInt): Color = {
+    val color = new Color().Lit(
       _.r -> r,
       _.g -> g,
       _.b -> b
     )
     color
   }
+
+  val black = Color(0.U, 0.U, 0.U)
+  val white = Color(3.U, 3.U, 3.U)
+  val red = Color(3.U, 0.U, 0.U)
+  val green = Color(0.U, 3.U, 0.U)
+  val cyan = Color(2.U, 3.U, 3.U)
 }

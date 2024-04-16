@@ -9,7 +9,7 @@ class Ball(res: Resolution) extends Module {
 
   val io = IO(new Bundle {
     val pxlPos = Input(Vec2D(UInt(log2Ceil(res.width).W)))
-    val rgb = Output(Color(2.W))
+    val rgb = Output(Color())
     val active = Output(Bool())
 
     val gameTick = Input(Bool())
@@ -19,7 +19,7 @@ class Ball(res: Resolution) extends Module {
 
     val newGame = Input(Bool())
     val run = Input(Bool())
-    val lost = Output(Bool())
+    val lost = Output(Vec(2, Bool()))
   })
 
   val size = 11
@@ -33,8 +33,8 @@ class Ball(res: Resolution) extends Module {
 
   val posReg = RegInit(
     Vec2D(
-      (res.width / 2 + size / 2).U(log2Ceil(res.width).W),
-      (res.height / 2 + size / 2).U(log2Ceil(res.height).W)
+      (res.width / 2 - size / 2).U(log2Ceil(res.width).W),
+      (res.height / 2 - size / 2).U(log2Ceil(res.height).W)
     )
   )
   val velReg = RegInit(
@@ -47,20 +47,18 @@ class Ball(res: Resolution) extends Module {
   when(io.gameTick && io.run) {
 
     when(
-      posReg.x <= 10.U && posReg.y
-        .inRange(
-          io.leftPedal - (30 + size / 2).U,
-          io.leftPedal + (30 - size / 2).U
-        )
+      posReg.x <= 10.U && posReg.y.inRange(
+        io.leftPedal - (size / 2).U,
+        io.leftPedal + (60 - size / 2).U
+      )
     ) {
       velReg.x := -velReg.x
       posReg.x := (posReg.x.asSInt - velReg.x).asUInt
     }.elsewhen(
-      posReg.x >= (res.width - 1 - 10 - size).U && posReg.y
-        .inRange(
-          io.rightPedal - (30).U,
-          io.rightPedal + (30).U
-        )
+      posReg.x >= (res.width - 1 - 10 - size).U && posReg.y.inRange(
+        io.rightPedal - (size / 2).U,
+        io.rightPedal + (60 - size / 2).U
+      )
     ) {
       velReg.x := -velReg.x
       posReg.x := (posReg.x.asSInt - velReg.x).asUInt
@@ -87,17 +85,13 @@ class Ball(res: Resolution) extends Module {
 
   val spriteBit = sprite(spriteOffset.y)(spriteOffset.x)
 
-  val black = Color(2.W, 0.U, 0.U, 0.U)
-  val cyan = Color(2.W, 2.U, 3.U, 3.U)
-  val red = Color(2.W, 3.U, 0.U, 0.U)
+  val lostLeft = posReg.x < 4.U
+  val lostRight = posReg.x > (res.width - 1 - size).U
 
-  val lost = posReg.x < 4.U ||
-    posReg.x > (res.width - 1 - size).U
-
-  val activeColor = Mux(lost, red, cyan)
-  io.rgb := Mux(active && spriteBit, activeColor, black)
+  val activeColor = Mux(lostLeft || lostRight, Color.red, Color.cyan)
+  io.rgb := Mux(spriteBit, activeColor, Color.black)
   io.active := active
-  io.lost := lost
+  io.lost := VecInit(lostLeft, lostRight)
 
   when(io.newGame) {
     posReg := Vec2D(

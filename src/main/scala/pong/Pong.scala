@@ -10,7 +10,7 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
   val io = IO(new Bundle {
     val hSync = Output(Bool())
     val vSync = Output(Bool())
-    val rgb = Output(Color(2.W))
+    val rgb = Output(Color())
 
     val btn = Input(UInt(4.W))
 
@@ -50,7 +50,7 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
 
   val score = Module(new TextField(res, res.width / 2, 0))
   score.io.pxlPos := Vec2D(vgaTimer.io.x, vgaTimer.io.y)
-  score.io.up := stateReg === State.Reset
+  score.io.up := VecInit(0.B, 0.B)
 
   io.hSync := vgaTimer.io.hSync
   io.vSync := vgaTimer.io.vSync
@@ -60,7 +60,8 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
       pedal0.io.active -> pedal0.io.rgb,
       pedal1.io.active -> pedal1.io.rgb,
       score.io.active -> score.io.rgb,
-      ball.io.active -> ball.io.rgb
+      ball.io.active -> ball.io.rgb,
+      true.B -> Color.black
     )
   )
 
@@ -71,8 +72,9 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
       }
     }
     is(State.Playing) {
-      when(ball.io.lost) {
+      when(ball.io.lost.reduce(_ || _)) {
         stateReg := State.GameOver
+        score.io.up := VecInit(ball.io.lost.map(!_))
       }
     }
     is(State.GameOver) {
@@ -85,6 +87,6 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
     }
   }
 
-  io.state := ball.io.lost ## stateReg.asUInt
+  io.state := ball.io.lost(1) ## ball.io.lost(0) ## stateReg.asUInt
 
 }

@@ -28,7 +28,7 @@ class ChiselTop() extends Module {
     input  wire       rst_n     // reset_n - low to reset
    */
 
-  val pong = Module(new Pong(Resolution.VGA640x480)(100.MHz))
+  val pong = Module(new Pong(Resolution.VGA640x480)(50.MHz))
   pong.io.btn := io.ui_in(3, 0)
 
   io.uio_oe := 1.U

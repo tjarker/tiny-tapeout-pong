@@ -28,6 +28,11 @@ module basys3_top (
     wire rst_n = ~reset;
     wire ena = 1'b1;
 
+    reg clock_50Mhz = 1'b0;
+
+    always @(posedge clock) clock_50Mhz = ~clock_50Mhz;
+
+
     wire [7:0] ui_in = {4'b0000 ,btnD, btnR, btnL ,btnU};
     wire [7:0] uo_out;
     wire [7:0] uio_in = 8'b00000000;
@@ -65,8 +70,8 @@ module basys3_top (
           .uio_out(uio_out),  // IOs: Output path
           .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
           .ena    (ena),      // enable - goes high when design is selected
-          .clk    (clock),      // clock
+          .clk    (clock_50Mhz),      // clock
           .rst_n  (rst_n)     // not reset
       );
 
-endmodule : basys3_top
+endmodule

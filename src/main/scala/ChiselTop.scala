@@ -1,5 +1,5 @@
 import chisel3._
-import chisel3.util.Cat
+import chisel3.util.{Cat, Fill}
 import pong.Pong
 import pong.etc._
 import pong.vga.Resolution
@@ -30,8 +30,9 @@ class ChiselTop() extends Module {
 
   val pong = Module(new Pong(Resolution.VGA640x480)(50.MHz))
   pong.io.btn := io.ui_in(3, 0)
+  pong.io.ena := io.ena
 
-  io.uio_oe := 1.U
+  io.uio_oe := Fill(8, 1.B)
   io.uio_out := pong.io.state
 
   io.uo_out := Cat(

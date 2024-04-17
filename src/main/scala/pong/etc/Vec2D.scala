@@ -2,7 +2,6 @@ package pong.etc
 
 import chisel3._
 import chisel3.experimental.BundleLiterals.AddBundleLiteralConstructor
-import chisel3.internal.firrtl.Width
 
 class Vec2D[T <: Data with Num[T]](t: => T) extends Bundle {
   val x = t

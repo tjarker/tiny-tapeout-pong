@@ -63,7 +63,7 @@ module basys3_top (
                     (blue == 2'b10) ? 4'b1000 :
                     4'b1111;
 
-    tt_chisel_pong user_project (
+    tt_um_chisel_pong user_project (
           .ui_in  (ui_in),    // Dedicated inputs
           .uo_out (uo_out),   // Dedicated outputs
           .uio_in (uio_in),   // IOs: Input path

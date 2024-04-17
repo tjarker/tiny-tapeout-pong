@@ -5,20 +5,11 @@ import chisel3.util._
 import pong.etc._
 import pong.vga.Resolution
 
-class Ball(res: Resolution) extends Module {
+class Ball(res: Resolution, pedalSize: Pedal.Size) extends GameObject(res) {
 
   val io = IO(new Bundle {
-    val pxlPos = Input(Vec2D(UInt(log2Ceil(res.width).W)))
-    val rgb = Output(Color())
-    val active = Output(Bool())
-
-    val gameTick = Input(Bool())
-
-    val leftPedal = Input(UInt(9.W))
-    val rightPedal = Input(UInt(9.W))
-
-    val newGame = Input(Bool())
-    val run = Input(Bool())
+    val leftPedalPos = Input(UInt(9.W))
+    val rightPedalPos = Input(UInt(9.W))
     val lost = Output(Vec(2, Bool()))
   })
 
@@ -26,7 +17,7 @@ class Ball(res: Resolution) extends Module {
 
   val sprite = BallBitmap(size, size)
 
-  val lfsr = chisel3.util.random.LFSR(4, io.newGame)
+  val lfsr = chisel3.util.random.LFSR(4, gameIO.newGame)
 
   val speeds =
     VecInit(-3.S(5.W), -2.S(5.W), 2.S(5.W), 3.S(5.W))
@@ -44,21 +35,22 @@ class Ball(res: Resolution) extends Module {
     )
   )
 
-  when(io.gameTick && io.run) {
+  when(gameIO.tick) {
 
     when(
-      posReg.x <= 10.U && posReg.y.inRange(
-        io.leftPedal - (size / 2).U,
-        io.leftPedal + (60 - size / 2).U
+      posReg.x <= pedalSize.width.U && posReg.y.inRange(
+        io.leftPedalPos - (size / 2).U,
+        io.leftPedalPos + (pedalSize.height - size / 2).U
       )
     ) {
       velReg.x := -velReg.x
       posReg.x := (posReg.x.asSInt - velReg.x).asUInt
     }.elsewhen(
-      posReg.x >= (res.width - 1 - 10 - size).U && posReg.y.inRange(
-        io.rightPedal - (size / 2).U,
-        io.rightPedal + (60 - size / 2).U
-      )
+      posReg.x >= (res.width - 1 - pedalSize.width - size).U && posReg.y
+        .inRange(
+          io.rightPedalPos - (size / 2).U,
+          io.rightPedalPos + (pedalSize.height - size / 2).U
+        )
     ) {
       velReg.x := -velReg.x
       posReg.x := (posReg.x.asSInt - velReg.x).asUInt
@@ -75,12 +67,12 @@ class Ball(res: Resolution) extends Module {
   }
 
   val active =
-    io.pxlPos.x.inRange(posReg.x, posReg.x + size.U) &&
-      io.pxlPos.y.inRange(posReg.y, posReg.y + size.U)
+    gameIO.rendering.pxlPos.x.inRange(posReg.x, posReg.x + size.U) &&
+      gameIO.rendering.pxlPos.y.inRange(posReg.y, posReg.y + size.U)
 
   val spriteOffset = Vec2D(
-    io.pxlPos.x - posReg.x,
-    io.pxlPos.y - posReg.y
+    gameIO.rendering.pxlPos.x - posReg.x,
+    gameIO.rendering.pxlPos.y - posReg.y
   )
 
   val spriteBit = sprite(spriteOffset.y)(spriteOffset.x)
@@ -89,11 +81,11 @@ class Ball(res: Resolution) extends Module {
   val lostRight = posReg.x > (res.width - 1 - size).U
 
   val activeColor = Mux(lostLeft || lostRight, Color.red, Color.cyan)
-  io.rgb := Mux(spriteBit, activeColor, Color.black)
-  io.active := active
+  gameIO.rendering.color := Mux(spriteBit, activeColor, Color.black)
+  gameIO.rendering.active := active
   io.lost := VecInit(lostLeft, lostRight)
 
-  when(io.newGame) {
+  when(gameIO.newGame) {
     posReg := Vec2D(
       (res.width / 2 + size / 2).U(log2Ceil(res.width).W),
       (res.height / 2 + size / 2).U(log2Ceil(res.height).W)

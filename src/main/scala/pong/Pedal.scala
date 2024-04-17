@@ -2,44 +2,51 @@ package pong
 
 import chisel3._
 import chisel3.util.log2Ceil
-import pong.vga.Resolution
 import pong.etc._
+import pong.vga.Resolution
 
-class Pedal(res: Resolution, xRange: Range) extends Module {
+object Pedal {
+  trait Side
+  case object Left extends Side
+  case object Right extends Side
+
+  case class Size(width: Int, height: Int)
+}
+
+class Pedal(res: Resolution, size: Pedal.Size, side: Pedal.Side)
+    extends GameObject(res) {
 
   val io = IO(new Bundle {
     val up = Input(Bool())
     val down = Input(Bool())
-    val pxlPos = Input(Vec2D(UInt(log2Ceil(res.width).W)))
-    val rgb = Output(Color())
-    val active = Output(Bool())
-
     val pos = Output(UInt(log2Ceil(res.height).W))
-
-    val gameTick = Input(Bool())
   })
 
   val speed = 3
 
-  val pedalHeight = 60
-
   val pos = RegInit(
-    (res.height / 2 - pedalHeight / 2).U(log2Ceil(res.height).W)
+    (res.height / 2 - size.height / 2).U(log2Ceil(res.height).W)
   )
 
-  when(io.gameTick) {
+  when(gameIO.tick) {
     when(io.up && pos > 0.U) {
       pos := pos - speed.U
-    }.elsewhen(io.down && pos < (res.height - pedalHeight).U) {
+    }.elsewhen(io.down && pos < (res.height - size.height).U) {
       pos := pos + speed.U
     }
   }
 
-  val active = io.pxlPos.x.inRange(xRange.start.U, xRange.end.U) &&
-    io.pxlPos.y.inRange(pos, pos + pedalHeight.U)
+  val xRange = side match {
+    case Pedal.Left  => 0 until size.width
+    case Pedal.Right => res.width - size.width until res.width
+  }
 
-  io.rgb := Color.green
-  io.active := active
+  val active =
+    gameIO.rendering.pxlPos.x.inRange(xRange.start.U, xRange.end.U) &&
+      gameIO.rendering.pxlPos.y.inRange(pos, pos + size.height.U)
+
+  gameIO.rendering.color := Color.green
+  gameIO.rendering.active := active
   io.pos := pos
 
 }

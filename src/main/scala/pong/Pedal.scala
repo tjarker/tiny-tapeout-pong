@@ -1,7 +1,7 @@
 package pong
 
 import chisel3._
-import chisel3.util.log2Ceil
+import chisel3.util.{MuxCase, log2Ceil}
 import pong.etc._
 import pong.vga.Resolution
 
@@ -42,27 +42,32 @@ class Pedal(res: Resolution, size: Pedal.Size, side: Pedal.Side)
           io.ballPos.x > ((res.width * 0.33).toInt).U && !io.ballVel.x(4)
       }) {
 
-        val midPoint = pos + (size.height / 2).U
-        val ballNotWrappedAround = io.ballPos.y < (res.height + 20).U
+        val sPos = (0.B ## pos).asSInt
+        val sBall = (0.B ## io.ballPos.y).asSInt
 
-        when( // far off
-          ballNotWrappedAround && midPoint < (io.ballPos.y - 20.U) && pos < (res.height - size.height - speed).U
-        ) {
-          pos := pos + speed.U
-        }.elsewhen(
-          ballNotWrappedAround && midPoint < io.ballPos.y && pos < (res.height - size.height - speed).U
-        ) { // close
-          pos := pos + 1.U
-        }.elsewhen( // far off
-          midPoint > (io.ballPos.y + 20.U) && pos >= speed.U
-        ) {
-          pos := pos - speed.U
-        }.elsewhen(
-          midPoint > io.ballPos.y && pos >= speed.U
-        ) { // close
-          pos := pos - 1.U
-        }
+        val err = (sPos + (size.height / 2).S) - sBall
+
+        val correction = MuxCase(
+          0.S,
+          Seq(
+            (err > speed.S) -> -speed.S,
+            (err > 0.S) -> -1.S,
+            (err < -speed.S) -> speed.S,
+            (err < 0.S) -> 1.S
+          )
+        )
+
+        val newPos = sPos + correction
+
+        pos := MuxCase(
+          newPos.asUInt,
+          Seq(
+            (newPos < 0.S) -> 0.U,
+            (newPos > (res.height - size.height).S) -> (res.height - size.height).U
+          )
+        )
       }
+
     }.elsewhen(io.up && pos >= speed.U) {
       pos := pos - speed.U
     }.elsewhen(io.down && pos < (res.height - size.height - speed).U) {

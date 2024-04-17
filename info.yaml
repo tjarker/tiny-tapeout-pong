@@ -17,7 +17,7 @@ project:
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line.
   # For Chisel designs this is easy, as there is only one Verilg file to list, which contains all the Chisel generated Verilog.
   source_files:        
-    - "tt_chisel_pong.v"
+    - "tt_um_chisel_pong.v"
     - "ChiselTop.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.

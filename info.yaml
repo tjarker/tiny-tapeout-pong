@@ -12,7 +12,7 @@ project:
 
   # Your top module name must start with "tt_um_". Change the example and make it unique by including your github username.
   # tt_um_example will fail as name on submission. Change to something unique.
-  top_module:  "tt_chisel_pong"
+  top_module:  "tt_um_chisel_pong"
   
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line.
   # For Chisel designs this is easy, as there is only one Verilg file to list, which contains all the Chisel generated Verilog.

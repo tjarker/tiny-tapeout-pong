@@ -11,6 +11,9 @@ class Ball(res: Resolution, pedalSize: Pedal.Size) extends GameObject(res) {
     val leftPedalPos = Input(UInt(9.W))
     val rightPedalPos = Input(UInt(9.W))
     val lost = Output(Vec(2, Bool()))
+
+    val pos = Output(Vec2D(UInt(log2Ceil(res.width).W)))
+    val vel = Output(Vec2D(SInt(5.W)))
   })
 
   val size = 11
@@ -58,7 +61,7 @@ class Ball(res: Resolution, pedalSize: Pedal.Size) extends GameObject(res) {
       posReg.x := (posReg.x.asSInt + velReg.x).asUInt
     }
 
-    when(!posReg.y.inRange(0.U, (res.height - size).U)) {
+    when(!posReg.y.inRange(2.U, (res.height - size - 2).U)) {
       velReg.y := -velReg.y
       posReg.y := (posReg.y.asSInt - velReg.y).asUInt
     }.otherwise {
@@ -77,13 +80,16 @@ class Ball(res: Resolution, pedalSize: Pedal.Size) extends GameObject(res) {
 
   val spriteBit = sprite(spriteOffset.y)(spriteOffset.x)
 
-  val lostLeft = posReg.x < 4.U
+  val lostLeft = posReg.x < 3.U
   val lostRight = posReg.x > (res.width - 1 - size).U
 
   val activeColor = Mux(lostLeft || lostRight, Color.red, Color.cyan)
   gameIO.rendering.color := Mux(spriteBit, activeColor, Color.black)
   gameIO.rendering.active := active
   io.lost := VecInit(lostLeft, lostRight)
+
+  io.pos := posReg
+  io.vel := velReg
 
   when(gameIO.newGame) {
     posReg := Vec2D(

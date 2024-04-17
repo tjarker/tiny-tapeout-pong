@@ -30,10 +30,11 @@ class ChiselTop() extends Module {
 
   val pong = Module(new Pong(Resolution.VGA640x480)(50.MHz))
   pong.io.btn := io.ui_in(3, 0)
+  pong.io.autopilot := VecInit(io.ui_in(5), io.ui_in(4))
   pong.io.ena := io.ena
 
   io.uio_oe := Fill(8, 1.B)
-  io.uio_out := pong.io.state
+  io.uio_out := pong.io.debug
 
   io.uo_out := Cat(
     pong.io.hSync,

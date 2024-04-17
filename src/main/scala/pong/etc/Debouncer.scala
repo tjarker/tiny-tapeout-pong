@@ -18,7 +18,7 @@ class Debouncer extends Module {
     reg := Cat(io.in, reg(1))
   }
 
-  io.out := reg.andR && io.tick
+  io.out := reg.andR
 
 }
 

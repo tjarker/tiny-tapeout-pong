@@ -26,4 +26,5 @@ object Color {
   val red = Color(3.U, 0.U, 0.U)
   val green = Color(0.U, 3.U, 0.U)
   val cyan = Color(2.U, 3.U, 3.U)
+  val blue = Color(0.U, 0.U, 3.U)
 }

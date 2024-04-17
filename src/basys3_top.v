@@ -21,6 +21,8 @@ module basys3_top (
     input wire btnL,          // button L
     input wire btnR,          // button R
 
+    input wire [1:0] sw,      // switches [1:0]
+
     input  wire clock,        // clock
     input  wire reset         // reset - high active
 );
@@ -33,7 +35,7 @@ module basys3_top (
     always @(posedge clock) clock_50Mhz = ~clock_50Mhz;
 
 
-    wire [7:0] ui_in = {4'b0000 ,btnD, btnR, btnL ,btnU};
+    wire [7:0] ui_in = {2'b00, sw, btnD, btnR, btnL ,btnU};
     wire [7:0] uo_out;
     wire [7:0] uio_in = 8'b00000000;
     wire [7:0] uio_out;
@@ -74,4 +76,4 @@ module basys3_top (
           .rst_n  (rst_n)     // not reset
       );
 
-endmodule
+endmodule : basys3_top

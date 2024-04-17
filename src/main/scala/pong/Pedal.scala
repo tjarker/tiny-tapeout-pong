@@ -20,18 +20,52 @@ class Pedal(res: Resolution, size: Pedal.Size, side: Pedal.Side)
     val up = Input(Bool())
     val down = Input(Bool())
     val pos = Output(UInt(log2Ceil(res.height).W))
+
+    val ballPos = Input(Vec2D(UInt(log2Ceil(res.width).W)))
+    val ballVel = Input(Vec2D(SInt(5.W)))
+    val force = Input(Bool())
   })
 
-  val speed = 3
+  val speed = 4
 
   val pos = RegInit(
     (res.height / 2 - size.height / 2).U(log2Ceil(res.height).W)
   )
 
   when(gameIO.tick) {
-    when(io.up && pos > 0.U) {
+    when(io.force) {
+
+      when(side match {
+        case Pedal.Left =>
+          io.ballPos.x < ((res.width * 0.66).toInt).U && io.ballVel.x(4)
+        case Pedal.Right =>
+          io.ballPos.x > ((res.width * 0.33).toInt).U && !io.ballVel.x(4)
+      }) {
+
+        val midPoint = pos + (size.height / 2).U
+        val ballNotWrappedAround = io.ballPos.y < (res.height + 20).U
+
+        when( // far off
+          ballNotWrappedAround && midPoint < (io.ballPos.y - 20.U) && pos < (res.height - size.height - speed).U
+        ) {
+          pos := pos + speed.U
+        }.elsewhen(
+          ballNotWrappedAround && midPoint < io.ballPos.y && pos < (res.height - size.height - speed).U
+        ) { // close
+          pos := pos + 1.U
+        }.elsewhen( // far off
+          midPoint > (io.ballPos.y + 20.U) && pos >= speed.U
+        ) {
+          pos := pos - speed.U
+        }.elsewhen(
+          midPoint > io.ballPos.y && pos >= speed.U
+        ) { // close
+          pos := pos - 1.U
+        }
+      }
+    }.elsewhen(io.up && pos >= speed.U) {
       pos := pos - speed.U
-    }.elsewhen(io.down && pos < (res.height - size.height).U) {
+    }.elsewhen(io.down && pos < (res.height - size.height - speed).U) {
       pos := pos + speed.U
     }
   }
@@ -45,7 +79,7 @@ class Pedal(res: Resolution, size: Pedal.Size, side: Pedal.Side)
     gameIO.rendering.pxlPos.x.inRange(xRange.start.U, xRange.end.U) &&
       gameIO.rendering.pxlPos.y.inRange(pos, pos + size.height.U)
 
-  gameIO.rendering.color := Color.green
+  gameIO.rendering.color := Mux(io.force, Color.blue, Color.green)
   gameIO.rendering.active := active
   io.pos := pos
 

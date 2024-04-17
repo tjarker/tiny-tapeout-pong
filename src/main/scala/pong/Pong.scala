@@ -14,9 +14,11 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
 
     val btn = Input(UInt(4.W))
 
+    val autopilot = Input(Vec(2, Bool()))
+
     val ena = Input(Bool())
 
-    val state = Output(UInt(8.W))
+    val debug = Output(UInt(8.W))
   })
 
   val pedalSize = Pedal.Size(10, 60)
@@ -33,17 +35,26 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
 
   val btn = io.btn.asBools.map(Debouncer(_, tick))
 
+  val pedalBtn = btn.map(b => b && tick)
+
   val leftPedal = Module(new Pedal(res, pedalSize, Pedal.Left))
-  leftPedal.io.up := btn(0)
-  leftPedal.io.down := btn(1)
+  leftPedal.io.up := pedalBtn(0)
+  leftPedal.io.down := pedalBtn(1)
 
   val rightPedal = Module(new Pedal(res, pedalSize, Pedal.Right))
-  rightPedal.io.up := btn(2)
-  rightPedal.io.down := btn(3)
+  rightPedal.io.up := pedalBtn(2)
+  rightPedal.io.down := pedalBtn(3)
 
   val ball = Module(new Ball(res, pedalSize))
   ball.io.leftPedalPos := leftPedal.io.pos
   ball.io.rightPedalPos := rightPedal.io.pos
+
+  leftPedal.io.ballPos := ball.io.pos
+  rightPedal.io.ballPos := ball.io.pos
+  leftPedal.io.ballVel := ball.io.vel
+  rightPedal.io.ballVel := ball.io.vel
+  leftPedal.io.force := io.autopilot(0)
+  rightPedal.io.force := io.autopilot(1)
 
   val score = Module(new TextField(res, res.width / 2, 0))
   score.io.increaseScore := VecInit(
@@ -88,7 +99,6 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
     }
   }
 
-  io.state := score.io.increaseScore(1) ## score.io.increaseScore(0) ## ball.io
-    .lost(1) ## ball.io.lost(0) ## stateReg.asUInt.apply(2, 0)
+  io.debug := stateReg.asUInt.apply(2, 0)
 
 }

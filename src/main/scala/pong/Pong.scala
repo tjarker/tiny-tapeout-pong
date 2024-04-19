@@ -99,6 +99,12 @@ class Pong(res: Resolution)(implicit sysFreq: Hertz) extends Module {
     }
   }
 
-  io.debug := stateReg.asUInt.apply(2, 0)
-
+  io.debug := Cat(
+    tick,
+    ball.io.lost(1),
+    ball.io.lost(0),
+    vgaTimer.io.hSync,
+    vgaTimer.io.vSync,
+    stateReg.asUInt.apply(2, 0)
+  )
 }

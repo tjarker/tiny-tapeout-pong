@@ -24,8 +24,8 @@ class VgaTimer(res: Resolution)(implicit sysFreq: Hertz) extends Module {
   val (yReg, yWrap) = Counter(hWrap, res.frame)
 
   // connect IO
-  io.vSync := (yReg >= res.vSyncStart.U) && (yReg < res.vSyncEnd.U)
-  io.hSync := (xReg >= res.hSyncStart.U) && (xReg < res.hSyncEnd.U)
+  io.vSync := !((yReg >= res.vSyncStart.U) && (yReg < res.vSyncEnd.U))
+  io.hSync := !((xReg >= res.hSyncStart.U) && (xReg < res.hSyncEnd.U))
   io.pos.x := xReg
   io.pos.y := yReg
   io.drawing := yReg < res.v.active.U

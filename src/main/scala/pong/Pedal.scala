@@ -37,9 +37,9 @@ class Pedal(res: Resolution, size: Pedal.Size, side: Pedal.Side)
 
       when(side match {
         case Pedal.Left =>
-          io.ballPos.x < ((res.width * 0.66).toInt).U && io.ballVel.x(4)
+          io.ballPos.x < ((res.width * 0.5).toInt).U && io.ballVel.x(4)
         case Pedal.Right =>
-          io.ballPos.x > ((res.width * 0.33).toInt).U && !io.ballVel.x(4)
+          io.ballPos.x > ((res.width * 0.5).toInt).U && !io.ballVel.x(4)
       }) {
 
         val sPos = (0.B ## pos).asSInt

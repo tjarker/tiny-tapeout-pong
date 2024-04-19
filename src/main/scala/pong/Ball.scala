@@ -41,22 +41,22 @@ class Ball(res: Resolution, pedalSize: Pedal.Size) extends GameObject(res) {
   when(gameIO.tick) {
 
     when(
-      posReg.x <= pedalSize.width.U && posReg.y.inRange(
-        io.leftPedalPos - (size / 2).U,
-        io.leftPedalPos + (pedalSize.height - size / 2).U
+      posReg.x < pedalSize.width.U && posReg.y.addMsb.asSInt.inRange(
+        io.leftPedalPos.addMsb.asSInt - (size / 2).S,
+        io.leftPedalPos.addMsb.asSInt + (pedalSize.height - size / 2).S
       )
     ) {
       velReg.x := -velReg.x
-      posReg.x := (posReg.x.asSInt - velReg.x).asUInt
+      posReg.x := pedalSize.width.U
     }.elsewhen(
-      posReg.x >= (res.width - 1 - pedalSize.width - size).U && posReg.y
+      posReg.x > (res.width - 1 - pedalSize.width - size).U && posReg.y.addMsb.asSInt
         .inRange(
-          io.rightPedalPos - (size / 2).U,
-          io.rightPedalPos + (pedalSize.height - size / 2).U
+          io.rightPedalPos.addMsb.asSInt - (size / 2).S,
+          io.rightPedalPos.addMsb.asSInt + (pedalSize.height - size / 2).S
         )
     ) {
       velReg.x := -velReg.x
-      posReg.x := (posReg.x.asSInt - velReg.x).asUInt
+      posReg.x := (res.width - 1 - pedalSize.width - size).U
     }.otherwise {
       posReg.x := (posReg.x.asSInt + velReg.x).asUInt
     }

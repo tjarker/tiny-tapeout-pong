@@ -1,6 +1,12 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg)
 
-# Tiny Tapeout Chisel Project Template
+# Tiny Tapeout Chisel Pong
+
+- simple Pong implementation in Chisel
+- uses VGA output
+- ball sprite
+- score display
+- autopilot mode for both pedals
 
 - [Read the documentation for project](docs/info.md)
 
